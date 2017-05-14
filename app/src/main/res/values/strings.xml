@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Wroup Chat</string>
+
+    <!--Main Activity -->
+    <string name="btn_create_group">Create a group</string>
+    <string name="btn_join_group">Join to group</string>
+
+    <!-- Group Creation Dialog -->
+    <string name="label_group_name">Group name:</string>
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Group Chat Activiy -->
+    <string name="send_button">Send</string>
+
+</resources>
