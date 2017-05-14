@@ -12,5 +12,7 @@
 
     <!-- Group Chat Activiy -->
     <string name="send_button">Send</string>
+    <string name="device_connected">%s device connected to the group</string>
+    <string name="device_disconnected">%s device disconnected from the group</string>
 
 </resources>
