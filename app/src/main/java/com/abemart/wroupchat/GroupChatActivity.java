@@ -68,18 +68,21 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageWrapper normalMessage = new MessageWrapper();
-                normalMessage.setMessage(editTextMessage.getText().toString());
-                normalMessage.setMessageType(MessageWrapper.MessageType.NORMAL);
+                String messageStr = editTextMessage.getText().toString();
+                if (messageStr != null && !messageStr.isEmpty()) {
+                    MessageWrapper normalMessage = new MessageWrapper();
+                    normalMessage.setMessage(editTextMessage.getText().toString());
+                    normalMessage.setMessageType(MessageWrapper.MessageType.NORMAL);
 
-                if (isGroupOwner) {
-                    wroupService.sendMessageToAllClients(normalMessage);
-                } else {
-                    wroupClient.sendMessageToAllClients(normalMessage);
+                    if (isGroupOwner) {
+                        wroupService.sendMessageToAllClients(normalMessage);
+                    } else {
+                        wroupClient.sendMessageToAllClients(normalMessage);
+                    }
+
+                    chatAdapter.add(normalMessage);
+                    editTextMessage.setText("");
                 }
-
-                chatAdapter.add(normalMessage);
-                editTextMessage.setText("");
             }
         });
 

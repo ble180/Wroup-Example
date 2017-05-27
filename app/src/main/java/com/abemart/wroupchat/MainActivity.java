@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
     private void searchAvailableGroups() {
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Searching available groups...");
+        progressDialog.setMessage(getString(R.string.prgrss_searching_groups));
         progressDialog.show();
 
         wiFiP2PClient = WroupClient.getInstance(getApplicationContext());
@@ -132,14 +132,19 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
             @Override
             public void onNewServiceDeviceDiscovered(WroupServiceDevice serviceDevice) {
                 Log.i(TAG, "New group found:");
-                Log.i(TAG, "\tName: " + serviceDevice.getDeviceName());
+                Log.i(TAG, "\tName: " + serviceDevice.getTxtRecordMap().get(WroupService.SERVICE_GROUP_NAME));
             }
 
             @Override
             public void onFinishServiceDeviceDiscovered(List<WroupServiceDevice> serviceDevices) {
                 Log.i(TAG, "Found '" + serviceDevices.size() + "' groups");
                 progressDialog.dismiss();
-                showPickGroupDialog(serviceDevices);
+
+                if (serviceDevices.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.toast_not_found_groups),Toast.LENGTH_LONG).show();
+                } else {
+                    showPickGroupDialog(serviceDevices);
+                }
             }
 
             @Override
@@ -161,9 +166,15 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 final WroupServiceDevice serviceSelected = devices.get(which);
+                final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setMessage(getString(R.string.prgrss_connecting_to_group));
+                progressDialog.setIndeterminate(true);
+                progressDialog.show();
+
                 wiFiP2PClient.connectToService(serviceSelected, new ServiceConnectedListener() {
                     @Override
                     public void onServiceConnected(WroupDevice serviceDevice) {
+                        progressDialog.dismiss();
                         startGroupChatActivity(serviceSelected.getTxtRecordMap().get(WroupService.SERVICE_GROUP_NAME), false);
                     }
                 });

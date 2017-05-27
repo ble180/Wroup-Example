@@ -4,6 +4,9 @@
     <!--Main Activity -->
     <string name="btn_create_group">Create a group</string>
     <string name="btn_join_group">Join to group</string>
+    <string name="prgrss_searching_groups">Searching available groups...</string>
+    <string name="prgrss_connecting_to_group">Connecting to the group...</string>
+    <string name="toast_not_found_groups">Sorry, there aren\'t any group nearby</string>
 
     <!-- Group Creation Dialog -->
     <string name="label_group_name">Group name:</string>
