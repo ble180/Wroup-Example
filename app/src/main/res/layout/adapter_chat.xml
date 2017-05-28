@@ -20,16 +20,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username"
-            android:textColor="@color/black"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/text_view_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="Message Content"
-            android:textColor="@color/grey"/>
+            android:textColor="@android:color/white"/>
 
     </LinearLayout>
 

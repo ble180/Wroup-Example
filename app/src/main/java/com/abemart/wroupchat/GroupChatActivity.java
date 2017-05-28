@@ -8,25 +8,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.abemart.wroup.client.WroupClient;
 import com.abemart.wroup.common.WiFiP2PInstance;
 import com.abemart.wroup.common.WroupDevice;
+import com.abemart.wroup.common.listeners.ClientConnectedListener;
+import com.abemart.wroup.common.listeners.ClientDisconnectedListener;
 import com.abemart.wroup.common.listeners.DataReceivedListener;
 import com.abemart.wroup.common.messages.MessageWrapper;
 import com.abemart.wroup.service.WroupService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
-public class GroupChatActivity extends AppCompatActivity implements DataReceivedListener {
+public class GroupChatActivity extends AppCompatActivity implements DataReceivedListener, ClientConnectedListener, ClientDisconnectedListener {
 
     public static final String EXTRA_GROUP_NAME = "groupNameExtra";
     public static final String EXTRA_IS_GROUP_OWNER = "isGroupOwnerExtra";
 
     private ListView listViewChat;
-    private List<MessageWrapper> messages;
     private ChatAdapter chatAdapter;
 
     private String groupName;
@@ -34,16 +35,13 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
 
     private WroupService wroupService;
     private WroupClient wroupClient;
-    private WroupDevice currentDevice;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
-        messages = new ArrayList<>();
-        currentDevice = WiFiP2PInstance.getInstance(getApplicationContext()).getThisDevice();
-        chatAdapter = new ChatAdapter(getApplicationContext(), messages, currentDevice);
+        chatAdapter = new ChatAdapter(getApplicationContext(), new ArrayList<MessageWrapper>(), WiFiP2PInstance.getInstance(getApplicationContext()).getThisDevice());
 
         Intent startIntent = getIntent();
         groupName = startIntent.getStringExtra(EXTRA_GROUP_NAME);
@@ -52,9 +50,13 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
         if (isGroupOwner) {
             wroupService = WroupService.getInstance(getApplicationContext());
             wroupService.setDataReceivedListener(this);
+            wroupService.setClientDisconnectedListener(this);
+            wroupService.setClientConnectedListener(this);
         } else {
             wroupClient = WroupClient.getInstance(getApplicationContext());
             wroupClient.setDataReceivedListener(this);
+            wroupClient.setClientDisconnectedListener(this);
+            wroupClient.setClientConnectedListener(this);
         }
 
         listViewChat = (ListView) findViewById(R.id.list_view_group_chat);
@@ -66,22 +68,26 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageWrapper normalMessage = new MessageWrapper();
-                normalMessage.setMessage(editTextMessage.getText().toString());
-                normalMessage.setMessageType(MessageWrapper.MessageType.NORMAL);
+                String messageStr = editTextMessage.getText().toString();
+                if (messageStr != null && !messageStr.isEmpty()) {
+                    MessageWrapper normalMessage = new MessageWrapper();
+                    normalMessage.setMessage(editTextMessage.getText().toString());
+                    normalMessage.setMessageType(MessageWrapper.MessageType.NORMAL);
 
-                if (isGroupOwner) {
-                    wroupService.sendMessageToAllClients(normalMessage);
-                } else {
-                    wroupClient.sendMessageToAllClients(normalMessage);
+                    if (isGroupOwner) {
+                        wroupService.sendMessageToAllClients(normalMessage);
+                    } else {
+                        wroupClient.sendMessageToAllClients(normalMessage);
+                    }
+
+                    chatAdapter.add(normalMessage);
+                    editTextMessage.setText("");
                 }
-
-                chatAdapter.add(normalMessage);
-                editTextMessage.setText("");
             }
         });
 
         setActionBarTitle(groupName);
+        setTitle(groupName);
     }
 
     private void setActionBarTitle(String title) {
@@ -100,4 +106,23 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
         });
     }
 
+    @Override
+    public void onClientConnected(final WroupDevice wroupDevice) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.device_connected, wroupDevice.getDeviceName()), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onClientDisconnected(final WroupDevice wroupDevice) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.device_disconnected, wroupDevice.getDeviceName()), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }

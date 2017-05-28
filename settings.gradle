@@ -1,1 +1,1 @@
-include ':app', ':wroup'
+include ':app'
