@@ -13,8 +13,8 @@ import android.widget.Toast;
 import com.abemart.wroup.client.WroupClient;
 import com.abemart.wroup.common.WiFiP2PInstance;
 import com.abemart.wroup.common.WroupDevice;
+import com.abemart.wroup.common.listeners.ClientConnectedListener;
 import com.abemart.wroup.common.listeners.ClientDisconnectedListener;
-import com.abemart.wroup.common.listeners.ClientRegisteredListener;
 import com.abemart.wroup.common.listeners.DataReceivedListener;
 import com.abemart.wroup.common.messages.MessageWrapper;
 import com.abemart.wroup.service.WroupService;
@@ -22,7 +22,7 @@ import com.abemart.wroup.service.WroupService;
 import java.util.ArrayList;
 
 
-public class GroupChatActivity extends AppCompatActivity implements DataReceivedListener, ClientRegisteredListener, ClientDisconnectedListener {
+public class GroupChatActivity extends AppCompatActivity implements DataReceivedListener, ClientConnectedListener, ClientDisconnectedListener {
 
     public static final String EXTRA_GROUP_NAME = "groupNameExtra";
     public static final String EXTRA_IS_GROUP_OWNER = "isGroupOwnerExtra";
@@ -51,12 +51,12 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
             wroupService = WroupService.getInstance(getApplicationContext());
             wroupService.setDataReceivedListener(this);
             wroupService.setClientDisconnectedListener(this);
-            wroupService.setClientRegisteredListener(this);
+            wroupService.setClientConnectedListener(this);
         } else {
             wroupClient = WroupClient.getInstance(getApplicationContext());
             wroupClient.setDataReceivedListener(this);
             wroupClient.setClientDisconnectedListener(this);
-            wroupClient.setClientRegisteredListener(this);
+            wroupClient.setClientConnectedListener(this);
         }
 
         listViewChat = (ListView) findViewById(R.id.list_view_group_chat);
@@ -107,7 +107,7 @@ public class GroupChatActivity extends AppCompatActivity implements DataReceived
     }
 
     @Override
-    public void onClientRegistered(final WroupDevice wroupDevice) {
+    public void onClientConnected(final WroupDevice wroupDevice) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

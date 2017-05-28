@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private WiFiDirectBroadcastReceiver wiFiDirectBroadcastReceiver;
-    private WroupService wiFiP2PService;
-    private WroupClient wiFiP2PClient;
+    private WroupService wroupService;
+    private WroupClient wroupClient;
 
     private GroupCreationDialog groupCreationDialog;
 
@@ -87,20 +87,20 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
     protected void onDestroy() {
         super.onDestroy();
 
-        if (wiFiP2PService != null) {
-            wiFiP2PService.disconnect();
+        if (wroupService != null) {
+            wroupService.disconnect();
         }
 
-        if (wiFiP2PClient != null) {
-            wiFiP2PClient.disconnect();
+        if (wroupClient != null) {
+            wroupClient.disconnect();
         }
     }
 
     @Override
     public void onAcceptButtonListener(final String groupName) {
         if (!groupName.isEmpty()) {
-            wiFiP2PService = WroupService.getInstance(getApplicationContext());
-            wiFiP2PService.registerService(groupName, new ServiceRegisteredListener() {
+            wroupService = WroupService.getInstance(getApplicationContext());
+            wroupService.registerService(groupName, new ServiceRegisteredListener() {
 
                 @Override
                 public void onSuccessServiceRegistered() {
@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
         progressDialog.setMessage(getString(R.string.prgrss_searching_groups));
         progressDialog.show();
 
-        wiFiP2PClient = WroupClient.getInstance(getApplicationContext());
-        wiFiP2PClient.discoverServices(5000L, new ServiceDiscoveredListener() {
+        wroupClient = WroupClient.getInstance(getApplicationContext());
+        wroupClient.discoverServices(5000L, new ServiceDiscoveredListener() {
 
             @Override
             public void onNewServiceDeviceDiscovered(WroupServiceDevice serviceDevice) {
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements GroupCreationDial
                 progressDialog.setIndeterminate(true);
                 progressDialog.show();
 
-                wiFiP2PClient.connectToService(serviceSelected, new ServiceConnectedListener() {
+                wroupClient.connectToService(serviceSelected, new ServiceConnectedListener() {
                     @Override
                     public void onServiceConnected(WroupDevice serviceDevice) {
                         progressDialog.dismiss();
